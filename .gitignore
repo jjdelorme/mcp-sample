@@ -36,7 +36,6 @@ Log/
 # Visual Studio specific
 .vs/
 *.njsproj
-*.sln
 *.csproj.user
 *.vbproj.user
 
