@@ -1,0 +1,90 @@
+# .gitignore
+.envrc
+
+./python/weather/*
+
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+Log/
+
+# Visual Studio specific
+.vs/
+*.njsproj
+*.sln
+*.csproj.user
+*.vbproj.user
+
+# Rider specific
+.idea/
+*.DotSettings.user
+
+# User Secrets
+secrets.json
+**/secrets.json
+
+# NuGet Packages
+*.nupkg
+# The packages folder can be ignored because of Package Restore
+**/[Pp]ackages/*
+# except build/, which is used as an MSBuild target.
+!**/[Pp]ackages/build/
+# Roslyn Analyzers cache
+**/[Pp]ackages/Microsoft.CodeAnalysis.Analyzers.*/analyzers/dotnet/cs/Microsoft.CodeAnalysis.CSharp.Analyzers.dll.cache
+**/[Pp]ackages/Microsoft.CodeAnalysis.Analyzers.*/analyzers/dotnet/cs/Microsoft.CodeAnalysis.Analyzers.dll.cache
+
+# Local History for Visual Studio
+**/Backup*/
+**/backup*/
+
+# Test Results
+*.trx
+*.coverage
+*.coverlet.json
+
+# Environment files
+.env
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE cache/temporary files
+*.VC.db
+*.VC.VC.opendb
+
+# VS Code
+**/.vscode/*
+
+**/bin
+**/obj
