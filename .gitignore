@@ -87,3 +87,5 @@ Thumbs.db
 
 **/bin
 **/obj
+
+uv.lock
