@@ -89,3 +89,5 @@ Thumbs.db
 **/obj
 
 uv.lock
+
+**/.gemini

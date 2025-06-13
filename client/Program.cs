@@ -1,29 +1,69 @@
-﻿using Anthropic.SDK;
+﻿﻿using Anthropic.SDK;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using ModelContextProtocol.Client;
 
-var clientTransport = new StdioClientTransport(new StdioClientTransportOptions
+var builder = Host.CreateApplicationBuilder(args);
+
+builder.Configuration
+    .AddEnvironmentVariables()
+    .AddUserSecrets<Program>();
+
+var clientTransport = new StdioClientTransport(new()
 {
     Name = "WeatherService",
     Command = "/home/jasondel/dev/mcp/.venv/bin/python",
     Arguments = ["/home/jasondel/dev/mcp/server/python/weather.py"],
 });
 
-var client = await McpClientFactory.CreateAsync(clientTransport);
+await using var mcpClient = await McpClientFactory.CreateAsync(clientTransport);
 
-// Print the list of tools available from the server.
-foreach (var tool in await client.ListToolsAsync())
+var tools = await mcpClient.ListToolsAsync();
+foreach (var tool in tools)
 {
-    Console.WriteLine($"{tool.Name} ({tool.Description})");
+    Console.WriteLine($"Connected to server with tools: {tool.Name}");
 }
 
-// Execute a tool (this would normally be driven by LLM tool invocations).
-var result = await client.CallToolAsync(
-    "get_forecast",
-    new Dictionary<string, object?>() { ["latitude"] = 47.6062, ["longitude"] = -122.3321 },
-    cancellationToken:CancellationToken.None);
+using var anthropicClient = new AnthropicClient(new APIAuthentication(builder.Configuration["ANTHROPIC_API_KEY"]))
+    .Messages
+    .AsBuilder()
+    .UseFunctionInvocation()
+    .Build();
 
-// The weather tool returns a single text content object with the forecast.
-Console.WriteLine(result.Content.First(c => c.Type == "text").Text);
+var options = new ChatOptions
+{
+    MaxOutputTokens = 1000,
+    ModelId = "claude-3-5-sonnet-20241022",
+    Tools = [.. tools]
+};
+
+Console.ForegroundColor = ConsoleColor.Green;
+Console.WriteLine("MCP Client Started!");
+Console.ResetColor();
+
+PromptForInput();
+while(Console.ReadLine() is string query && !"exit".Equals(query, StringComparison.OrdinalIgnoreCase))
+{
+    if (string.IsNullOrWhiteSpace(query))
+    {
+        PromptForInput();
+        continue;
+    }
+
+    await foreach (var message in anthropicClient.GetStreamingResponseAsync(query, options))
+    {
+        Console.Write(message);
+    }
+    Console.WriteLine();
+
+    PromptForInput();
+}
+
+static void PromptForInput()
+{
+    Console.WriteLine("Enter a command (or 'exit' to quit):");
+    Console.ForegroundColor = ConsoleColor.Cyan;
+    Console.Write("> ");
+    Console.ResetColor();
+}
